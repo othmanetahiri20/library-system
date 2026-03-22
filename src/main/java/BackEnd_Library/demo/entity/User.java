@@ -22,14 +22,14 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
-    private String role;
+    private Role role;
     
-    @OneToMany(mappedBy="usesr", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="user", cascade = CascadeType.ALL)
     private List<Borrow> borrows ;
     
     public User(){}
     
-    public User(String name, String email, String password, String role){
+    public User(String name, String email, String password, Role role){
         this.name=name;
         this.email = email;
         this.password = password ; 
@@ -47,8 +47,8 @@ public class User {
     public String getPassword(){ return password ; }
     public void setPassword(String password){ this.password = password ; }
     
-    public String getRole(){return role ; }
-    public void setRole(String role){ this.role = role ; }
+    public Role getRole(){return role ; }
+    public void setRole(Role role){ this.role = role ; }
     
     public List<Borrow> getBorrow(){ return borrows ; }
     public void setBorrow(List<Borrow> borrows){this.borrows=borrows;}
