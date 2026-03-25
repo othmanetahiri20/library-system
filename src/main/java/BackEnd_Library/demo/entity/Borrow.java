@@ -21,7 +21,8 @@ public class Borrow {
     
     private LocalDate borrowDate ;
     private LocalDate returnDate ;
-    private String status ;
+    @Enumerated(EnumType.STRING )
+    private Status status ;
     
    @ManyToOne
    @Column(name = "user_id")
@@ -33,7 +34,7 @@ public class Borrow {
 
    public Borrow() {}
 
-   public Borrow(LocalDate borrowDate, LocalDate returnDate, String status, User user, Book book) {
+   public Borrow(LocalDate borrowDate, LocalDate returnDate, Status status, User user, Book book) {
         this.borrowDate = borrowDate;
         this.returnDate = returnDate;
         this.status = status;
@@ -61,11 +62,11 @@ public class Borrow {
         this.returnDate = returnDate;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
