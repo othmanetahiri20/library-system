@@ -8,10 +8,15 @@ import BackEnd_Library.demo.entity.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 /**
  *
  * @author USER
  */
 public interface UserRepository extends JpaRepository<User, Long>{
     
+    List<User> findByNameContaining(String name);
+    List<User> findByEmail(String name);
+    User findByEmailOrName(String email, String name);
 }
