@@ -22,7 +22,7 @@ public interface BookRepository extends JpaRepository<Book, Long>{
     List<Book> findByCategory(String category);
     
     @Query("SELECT b FROM Book b WHERE b NOT IN"+
-            "(SELECT bo.book FROM Borrow bo WHERE bo.status = 'BORROWED')")
+            "(SELECT bo.book FROM Borrow bo WHERE bo.status = BackEnd_Library.demo.entity.Status.BORROWED)")
     List<Book> findAvailiableBooks();
     
     @Modifying

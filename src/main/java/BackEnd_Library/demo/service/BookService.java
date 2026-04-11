@@ -7,10 +7,8 @@ package BackEnd_Library.demo.service;
 import BackEnd_Library.demo.repository.BookRepository;
 import BackEnd_Library.demo.repository.BorrowRepository;
 import BackEnd_Library.demo.entity.Book;
-import BackEnd_Library.demo.entity.Borrow;
 import BackEnd_Library.demo.entity.Status;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
@@ -96,45 +94,10 @@ public class BookService {
    
    @Transactional
    public void decreaseBookQuantity(Long id, int quantityToDecrease){
-       if(quantityToDecrease == 0)throw new IllegalArgumentException("Quantity must be > 0");
+       if(quantityToDecrease <= 0)throw new IllegalArgumentException("Quantity must be > 0");
        
        int update = bookRepo.updateQuantity(id, -quantityToDecrease);
        if(update == 0 ) throw new RuntimeException("Cannot decrease quantity: book not found or not enough stock");
-   }
-   
-   public void markBookAsBorrowed(Long bookId){
-       
-       Book book = bookRepo.findById(bookId).orElseThrow(()-> new RuntimeException("Book nit found"));
-       
-       if(book.getQuantity()<= 0) throw new RuntimeException("Book not available");
-       
-       book.setQuantity(book.getQuantity()-1);
-       
-       Borrow borrow= new Borrow();
-       borrow.setBook(book);
-       borrow.setStatus(Status.BORROWED);
-       borrow.setBorrowDate(LocalDate.now());
-       
-       borrowRepo.save(borrow);
-       bookRepo.save(book);
-       
-   }
-   
-   public void markBookAsReturned(Long borrowId){
-       
-       Book book = bookRepo.findById(borrowId).orElseThrow(()->new RuntimeException("Borow not found"));
-       
-       book.setQuantity(book.getQuantity()+1);
-       
-       Borrow borrow = new Borrow();
-       borrow.setBook(book);
-       borrow.setStatus(Status.RETURNED);
-       borrow.setReturnDate(LocalDate.now());
-
-       
-       borrowRepo.save(borrow);
-       bookRepo.save(book);
-       
    }
    
    public long countBooks(){
@@ -146,7 +109,7 @@ public class BookService {
    }
    
    public long countBorrowedBooks(){
-       return borrowRepo.countBYStatus( Status.BORROWED);
+       return borrowRepo.countByStatus( Status.BORROWED);
    }
    
 }

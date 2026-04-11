@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -25,6 +26,8 @@ public class UserService {
     }
     
     public User addUser(User user){
+        if(userRepo.existsByEmail(user.getEmail()))
+            throw new RuntimeException("Email already used :"+user.getEmail());
         return userRepo.save(user);
     }
     
@@ -33,14 +36,14 @@ public class UserService {
         
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
-        user.setPassword(userDetails.getPassword());
-        user.setBorrow(userDetails.getBorrow());
         user.setRole(userDetails.getRole());
         
         return userRepo.save(user);
     }
     
     public void deleteUser(Long id){
+        if(!userRepo.existsById(id))
+            throw new RuntimeException("User not found with id :" + id);
         userRepo.deleteById(id);
     }
     
@@ -62,37 +65,34 @@ public class UserService {
         return users;
     }
     
-    public List<User> searchUserByEmail(String email){
-        List<User> users =userRepo.findByEmail(email);
-        
-        if(users.isEmpty()){
-            throw new RuntimeException("User not found with this email :"+email);
-        }
-        return users;
+    public User searchUserByEmail(String email){
+        return userRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found whith email :"+email));
     }
     
-    public User logInUser(String email, String name, String password){
-        User user = userRepo.findByEmailOrName(email, name);
+    public User logInUser(String email, String password){
+        User user = userRepo.findByEmail(email).orElseThrow(()->new RuntimeException("No account found with this email"));
         if(!user.getPassword().equals(password)){
-            throw new RuntimeException("Name or email or password ar not correct");
+            throw new RuntimeException(" Incorrect password");
         }
         return user ;
     }
     
     public void logOutUser(){
-        
+        //géré coter javafx
     }
     
-    public void ChangePassword(String name, String email, String password, String newPassword){
-        User user = userRepo.findByEmailOrName(email, name);
-        if(user==null){
-            throw new RuntimeException("User not found Name or Email is inccorect");
-        }else if(!user.getPassword().equals(password)){
-            throw new RuntimeException("Name or email or password ar not correct");
-        }
+    @Transactional
+    public void ChangePassword(Long id, String oldPassword, String newPassword){
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found with id : " + id));
         
+        if (!user.getPassword().equals(oldPassword))
+            throw new RuntimeException("Incorrect current password");
+
+        if (newPassword == null || newPassword.isBlank())
+            throw new IllegalArgumentException("New password cannot be empty");
+
         user.setPassword(newPassword);
-        
         userRepo.save(user);
     }
     
